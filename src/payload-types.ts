@@ -69,6 +69,16 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    motherboards: Motherboard;
+    processors: Processor;
+    gpus: Gpus;
+    ram: Ram;
+    psus: Psus;
+    cases: Case;
+    coolers: Cooler;
+    storage: Storage;
+    builds: Build;
+    orders: Order;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +88,16 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    motherboards: MotherboardsSelect<false> | MotherboardsSelect<true>;
+    processors: ProcessorsSelect<false> | ProcessorsSelect<true>;
+    gpus: GpusSelect<false> | GpusSelect<true>;
+    ram: RamSelect<false> | RamSelect<true>;
+    psus: PsusSelect<false> | PsusSelect<true>;
+    cases: CasesSelect<false> | CasesSelect<true>;
+    coolers: CoolersSelect<false> | CoolersSelect<true>;
+    storage: StorageSelect<false> | StorageSelect<true>;
+    builds: BuildsSelect<false> | BuildsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -86,10 +106,10 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'ru' | 'ky') | ('en' | 'ru' | 'ky')[];
   globals: {};
   globalsSelect: {};
-  locale: null;
+  locale: 'en' | 'ru' | 'ky';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -165,6 +185,223 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "motherboards".
+ */
+export interface Motherboard {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  image?: (number | null) | Media;
+  description?: string | null;
+  stock_quantity: number;
+  socket: string;
+  form_factor: 'ATX' | 'Micro-ATX' | 'Mini-ITX';
+  supports_ddr4?: boolean | null;
+  supports_ddr5?: boolean | null;
+  ram_slots: number;
+  m2_slots: number;
+  sata_ports: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "processors".
+ */
+export interface Processor {
+  id: number;
+  name: string;
+  brand: 'intel' | 'amd';
+  price: number;
+  image: number | Media;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  stock_quantity: number;
+  socket: 'LGA1700' | 'LGA1200' | 'AM4' | 'AM5' | 'TR4';
+  tdp: number;
+  supports_ddr4?: boolean | null;
+  supports_ddr5?: boolean | null;
+  has_graphics?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Видеокарты
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gpus".
+ */
+export interface Gpus {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  image?: (number | null) | Media;
+  description?: string | null;
+  stock_quantity: number;
+  length_mm: number;
+  recommended_psu_w: number;
+  connector_8pin: number;
+  connector_16pin?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Оперативная память
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ram".
+ */
+export interface Ram {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  image?: (number | null) | Media;
+  description?: string | null;
+  stock_quantity: number;
+  type: 'DDR4' | 'DDR5';
+  modules_count: number;
+  total_capacity_gb: number;
+  speed_mhz: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "psus".
+ */
+export interface Psus {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  image?: (number | null) | Media;
+  description?: string | null;
+  stock_quantity: number;
+  wattage: number;
+  form_factor: 'ATX' | 'SFX' | 'SFX-L';
+  pcie_connectors: number;
+  has_16pin_connector?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cases".
+ */
+export interface Case {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  image?: (number | null) | Media;
+  description?: string | null;
+  stock_quantity: number;
+  supports_atx?: boolean | null;
+  supports_matx?: boolean | null;
+  supports_itx?: boolean | null;
+  max_gpu_length_mm: number;
+  max_cooler_height_mm: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coolers".
+ */
+export interface Cooler {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  image?: (number | null) | Media;
+  description?: string | null;
+  stock_quantity: number;
+  supports_lga1700?: boolean | null;
+  supports_am4?: boolean | null;
+  supports_am5?: boolean | null;
+  /**
+   * Должно быть выше TDP процессора
+   */
+  max_tdp: number;
+  /**
+   * Проверяется на совместимость с шириной корпуса
+   */
+  height_mm: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storage".
+ */
+export interface Storage {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  image?: (number | null) | Media;
+  description?: string | null;
+  stock_quantity: number;
+  type: 'NVMe' | 'SATA SSD' | 'HDD';
+  interface: 'M.2' | 'SATA';
+  /**
+   * Укажите объем в гигабайтах (например, 1024 для 1ТБ)
+   */
+  capacity_gb: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "builds".
+ */
+export interface Build {
+  id: number;
+  user: number | User;
+  name: string;
+  is_complete?: boolean | null;
+  cpu?: (number | null) | Processor;
+  mobo?: (number | null) | Motherboard;
+  gpu?: (number | null) | Gpus;
+  ram?: (number | null) | Ram;
+  psu?: (number | null) | Psus;
+  case?: (number | null) | Case;
+  cooler?: (number | null) | Cooler;
+  storage?: (number | null) | Storage;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  user: number | User;
+  build: number | Build;
+  status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+  total_price: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -194,6 +431,46 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'motherboards';
+        value: number | Motherboard;
+      } | null)
+    | ({
+        relationTo: 'processors';
+        value: number | Processor;
+      } | null)
+    | ({
+        relationTo: 'gpus';
+        value: number | Gpus;
+      } | null)
+    | ({
+        relationTo: 'ram';
+        value: number | Ram;
+      } | null)
+    | ({
+        relationTo: 'psus';
+        value: number | Psus;
+      } | null)
+    | ({
+        relationTo: 'cases';
+        value: number | Case;
+      } | null)
+    | ({
+        relationTo: 'coolers';
+        value: number | Cooler;
+      } | null)
+    | ({
+        relationTo: 'storage';
+        value: number | Storage;
+      } | null)
+    | ({
+        relationTo: 'builds';
+        value: number | Build;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -278,6 +555,186 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "motherboards_select".
+ */
+export interface MotherboardsSelect<T extends boolean = true> {
+  name?: T;
+  brand?: T;
+  price?: T;
+  image?: T;
+  description?: T;
+  stock_quantity?: T;
+  socket?: T;
+  form_factor?: T;
+  supports_ddr4?: T;
+  supports_ddr5?: T;
+  ram_slots?: T;
+  m2_slots?: T;
+  sata_ports?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "processors_select".
+ */
+export interface ProcessorsSelect<T extends boolean = true> {
+  name?: T;
+  brand?: T;
+  price?: T;
+  image?: T;
+  description?: T;
+  stock_quantity?: T;
+  socket?: T;
+  tdp?: T;
+  supports_ddr4?: T;
+  supports_ddr5?: T;
+  has_graphics?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gpus_select".
+ */
+export interface GpusSelect<T extends boolean = true> {
+  name?: T;
+  brand?: T;
+  price?: T;
+  image?: T;
+  description?: T;
+  stock_quantity?: T;
+  length_mm?: T;
+  recommended_psu_w?: T;
+  connector_8pin?: T;
+  connector_16pin?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ram_select".
+ */
+export interface RamSelect<T extends boolean = true> {
+  name?: T;
+  brand?: T;
+  price?: T;
+  image?: T;
+  description?: T;
+  stock_quantity?: T;
+  type?: T;
+  modules_count?: T;
+  total_capacity_gb?: T;
+  speed_mhz?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "psus_select".
+ */
+export interface PsusSelect<T extends boolean = true> {
+  name?: T;
+  brand?: T;
+  price?: T;
+  image?: T;
+  description?: T;
+  stock_quantity?: T;
+  wattage?: T;
+  form_factor?: T;
+  pcie_connectors?: T;
+  has_16pin_connector?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cases_select".
+ */
+export interface CasesSelect<T extends boolean = true> {
+  name?: T;
+  brand?: T;
+  price?: T;
+  image?: T;
+  description?: T;
+  stock_quantity?: T;
+  supports_atx?: T;
+  supports_matx?: T;
+  supports_itx?: T;
+  max_gpu_length_mm?: T;
+  max_cooler_height_mm?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coolers_select".
+ */
+export interface CoolersSelect<T extends boolean = true> {
+  name?: T;
+  brand?: T;
+  price?: T;
+  image?: T;
+  description?: T;
+  stock_quantity?: T;
+  supports_lga1700?: T;
+  supports_am4?: T;
+  supports_am5?: T;
+  max_tdp?: T;
+  height_mm?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "storage_select".
+ */
+export interface StorageSelect<T extends boolean = true> {
+  name?: T;
+  brand?: T;
+  price?: T;
+  image?: T;
+  description?: T;
+  stock_quantity?: T;
+  type?: T;
+  interface?: T;
+  capacity_gb?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "builds_select".
+ */
+export interface BuildsSelect<T extends boolean = true> {
+  user?: T;
+  name?: T;
+  is_complete?: T;
+  cpu?: T;
+  mobo?: T;
+  gpu?: T;
+  ram?: T;
+  psu?: T;
+  case?: T;
+  cooler?: T;
+  storage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  user?: T;
+  build?: T;
+  status?: T;
+  total_price?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

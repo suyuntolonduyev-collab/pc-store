@@ -7,17 +7,50 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
+import { Processors } from './collections/Processors'
+import { GPUs } from './collections/GPUs'
+import { RAM } from './collections/RAM'
+import { PSUs } from './collections/PSUs'
+import { Cases } from './collections/Cases'
+import { Coolers } from './collections/Coolers'
+import { Storage } from './collections/Storage'
+import { Builds } from './collections/Builds'
+import { Orders } from './collections/Orders'
+import Motherboards from './collections/Motherboards'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  localization: {
+    locales: [
+      { label: 'English', code: 'en' },
+      { label: 'Русский', code: 'ru' },
+      { label: 'Кыргызча', code: 'ky' },
+    ],
+    defaultLocale: 'en', // обязательно
+    fallback: true, // если перевода нет — вернёт дефолтный язык
+  },
   admin: {
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [
+    Users,
+    Media,
+    Motherboards,
+    Processors,
+    GPUs,
+    RAM,
+    PSUs,
+    Cases,
+    Coolers,
+    Storage,
+    Builds,
+    Orders,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
