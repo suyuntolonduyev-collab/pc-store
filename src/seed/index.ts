@@ -2,109 +2,53 @@ import 'dotenv/config'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
-const storageData = [
+const gpusData = [
   {
-    name: 'Samsung 990 Pro 2TB',
-    brandSlug: 'samsung',
-    type: 'NVMe',
-    interface: 'M.2',
-    capacity_gb: 2000,
-    price: 18500,
-    stock_quantity: 15,
+    name: 'MSI GeForce RTX 4070 SUPER Gaming X Slim',
+    brand: 'nvidia',
+    price: 78000,
+    stock_quantity: 8,
+    length_mm: 307,
+    recommended_psu_w: 650,
+    pin_8_connectors: 0,
+    has_16pin_connector: true, // Серия 4070 Super использует новый 16-pin (12VHPWR)
     description:
-      'Один из самых быстрых накопителей на рынке с интерфейсом PCIe 4.0. Идеально подходит для работы с видео и тяжелых игр.',
+      'Мощная видеокарта для игры в 2K разрешении на ультра-настройках. Тонкое исполнение Slim позволит установить её в большинство корпусов.',
   },
   {
-    name: 'WD Blue SN580 1TB',
-    brandSlug: 'wd',
-    type: 'NVMe',
-    interface: 'M.2',
-    capacity_gb: 1000,
-    price: 8400,
-    stock_quantity: 25,
+    name: 'ASUS ROG Strix GeForce RTX 4090 OC',
+    brand: 'nvidia',
+    price: 240000,
+    stock_quantity: 3,
+    length_mm: 358, // Настоящий гигант!
+    recommended_psu_w: 850,
+    pin_8_connectors: 0,
+    has_16pin_connector: true,
     description:
-      'Надежный и энергоэффективный NVMe накопитель для повседневных задач и гейминга среднего уровня.',
+      'Ультимативный флагман для 4K гейминга и тяжелых рабочих задач. Топовое охлаждение ROG Strix и экстремальный заводской разгон.',
   },
   {
-    name: 'Kingston KC3000 2048GB',
-    brandSlug: 'kingston',
-    type: 'NVMe',
-    interface: 'M.2',
-    capacity_gb: 2048,
-    price: 16200,
-    stock_quantity: 12,
-    description:
-      'Высокопроизводительный SSD с отличным ресурсом перезаписи (TBW) и эффективным графеновым радиатором.',
-  },
-  {
-    name: 'Crucial MX500 1TB',
-    brandSlug: 'crucial',
-    type: 'SATA SSD',
-    interface: 'SATA',
-    capacity_gb: 1000,
-    price: 7800,
-    stock_quantity: 30,
-    description:
-      'Классический 2.5-дюймовый SSD. Отличный вариант для апгрейда старых систем или как дополнительное хранилище.',
-  },
-  {
-    name: 'Seagate IronWolf 4TB',
-    brandSlug: 'seagate',
-    type: 'HDD',
-    interface: 'SATA',
-    capacity_gb: 4000,
-    price: 12500,
+    name: 'Sapphire AMD Radeon RX 7700 XT Pulse',
+    brand: 'amd', // Если в админке Select, поправь регистр при необходимости
+    price: 54000,
     stock_quantity: 10,
+    length_mm: 280,
+    recommended_psu_w: 700,
+    pin_8_connectors: 2, // Требует два классических 8-pin кабеля
+    has_16pin_connector: false,
     description:
-      'Специализированный жесткий диск для сетевых хранилищ (NAS) и систем, требующих высокой надежности хранения данных.',
+      'Сбалансированная видеокарта от AMD для комфортного гейминга в разрешении 1440p. Фирменная надежность серии Pulse.',
   },
-]
-
-async function seedCollection() {
-  const payload = await getPayload({ config: configPromise })
-
-  // 1. Сбор уникальных брендов для кэширования ID
-  const uniqueBrandSlugs = Array.from(new Set(storageData.map((item) => item.brandSlug)))
-  const brandsCache: Record<string, string> = {}
-
-  for (const slug of uniqueBrandSlugs) {
-    const brandRes = await payload.find({
-      collection: 'brands',
-      where: { slug: { equals: slug } },
-    })
-
-    if (brandRes.docs.length > 0 && brandRes.docs[0].id) {
-      brandsCache[slug] = brandRes.docs[0].id as string
-    } else {
-      throw new Error(`Бренд со slug '${slug}' не найден — сначала запустите seed-brands.ts`)
-    }
-  }
-
-  // 2. Создание записей в коллекции 'storage'
-  for (const item of storageData) {
-    const { brandSlug, ...restData } = item
-    const brandId = brandsCache[brandSlug]
-
-    const existing = await payload.find({
-      collection: 'storage',
-      where: { name: { equals: restData.name } },
-    })
-
-    if (existing.totalDocs === 0) {
-      await payload.create({
-        collection: 'storage',
-        data: {
-          ...restData,
-          brand: brandId,
-        },
-      })
-      console.log(`✅ Добавлено: ${restData.name}`)
-    } else {
-      console.log(`⏭️ Уже существует: ${restData.name}`)
-    }
-  }
-
-  process.exit(0)
-}
-
-seedCollection()
+  {
+    name: 'PowerColor AMD Radeon RX 7900 XTX Hellhound',
+    brand: 'amd',
+    price: 115000,
+    stock_quantity: 5,
+    length_mm: 320,
+    recommended_psu_w: 800,
+    pin_8_connectors: 2,
+    has_16pin_connector: false,
+    description:
+      'Флагманское решение от AMD с внушительным объемом видеопамяти 24 ГБ. Идеально подходит для игр в высоком разрешении и стриминга.',
+  },
+] as const
