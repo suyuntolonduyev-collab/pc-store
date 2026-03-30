@@ -79,6 +79,7 @@ export interface Config {
     storage: Storage;
     builds: Build;
     orders: Order;
+    brands: Brand;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -98,6 +99,7 @@ export interface Config {
     storage: StorageSelect<false> | StorageSelect<true>;
     builds: BuildsSelect<false> | BuildsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
+    brands: BrandsSelect<false> | BrandsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -190,7 +192,7 @@ export interface Media {
 export interface Motherboard {
   id: number;
   name: string;
-  brand: string;
+  brand: number | Brand;
   price: number;
   image?: (number | null) | Media;
   description?: string | null;
@@ -207,29 +209,27 @@ export interface Motherboard {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands".
+ */
+export interface Brand {
+  id: number;
+  name: string;
+  slug: string;
+  logo?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "processors".
  */
 export interface Processor {
   id: number;
   name: string;
-  brand: 'intel' | 'amd';
+  brand: number | Brand;
   price: number;
-  image: number | Media;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  image?: (number | null) | Media;
+  description?: string | null;
   stock_quantity: number;
   socket: 'LGA1700' | 'LGA1200' | 'AM4' | 'AM5' | 'TR4';
   tdp: number;
@@ -248,7 +248,7 @@ export interface Processor {
 export interface Gpus {
   id: number;
   name: string;
-  brand: string;
+  brand: number | Brand;
   price: number;
   image?: (number | null) | Media;
   description?: string | null;
@@ -269,7 +269,7 @@ export interface Gpus {
 export interface Ram {
   id: number;
   name: string;
-  brand: string;
+  brand: number | Brand;
   price: number;
   image?: (number | null) | Media;
   description?: string | null;
@@ -288,7 +288,7 @@ export interface Ram {
 export interface Psus {
   id: number;
   name: string;
-  brand: string;
+  brand: number | Brand;
   price: number;
   image?: (number | null) | Media;
   description?: string | null;
@@ -307,7 +307,7 @@ export interface Psus {
 export interface Case {
   id: number;
   name: string;
-  brand: string;
+  brand: number | Brand;
   price: number;
   image?: (number | null) | Media;
   description?: string | null;
@@ -327,7 +327,7 @@ export interface Case {
 export interface Cooler {
   id: number;
   name: string;
-  brand: string;
+  brand: number | Brand;
   price: number;
   image?: (number | null) | Media;
   description?: string | null;
@@ -471,6 +471,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'orders';
         value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'brands';
+        value: number | Brand;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -733,6 +737,17 @@ export interface OrdersSelect<T extends boolean = true> {
   build?: T;
   status?: T;
   total_price?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands_select".
+ */
+export interface BrandsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  logo?: T;
   updatedAt?: T;
   createdAt?: T;
 }

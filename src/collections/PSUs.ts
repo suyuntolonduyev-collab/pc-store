@@ -26,7 +26,9 @@ export const PSUs: CollectionConfig = {
     },
     {
       name: 'brand',
-      type: 'text',
+      type: 'relationship',
+      relationTo: 'brands',
+      hasMany: false,
       label: 'Бренд',
       required: true,
     },

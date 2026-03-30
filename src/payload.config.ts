@@ -17,6 +17,7 @@ import { Storage } from './collections/Storage'
 import { Builds } from './collections/Builds'
 import { Orders } from './collections/Orders'
 import Motherboards from './collections/Motherboards'
+import { Brands } from './collections/Brands'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -50,6 +51,7 @@ export default buildConfig({
     Storage,
     Builds,
     Orders,
+    Brands,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

@@ -30,14 +30,12 @@ export const Processors: CollectionConfig = {
     },
     {
       name: 'brand',
-      type: 'select',
       label: 'Бренд',
       required: true,
       index: true,
-      options: [
-        { label: 'Intel', value: 'intel' },
-        { label: 'AMD', value: 'amd' },
-      ],
+      type: 'relationship',
+      relationTo: 'brands',
+      hasMany: false,
     },
     {
       name: 'price',
@@ -52,11 +50,10 @@ export const Processors: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
       label: 'Изображение',
-      required: true,
     },
     {
       name: 'description',
-      type: 'richText', // Улучшаем описание до RichText для красивого вывода в портфолио
+      type: 'textarea',
       label: 'Описание',
     },
     {

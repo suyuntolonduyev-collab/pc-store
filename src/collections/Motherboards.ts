@@ -19,8 +19,9 @@ const Motherboards: CollectionConfig = {
     },
     {
       name: 'brand',
-      type: 'text',
-      label: 'Бренд',
+      type: 'relationship',
+      relationTo: 'brands',
+      hasMany: false,
       required: true,
     },
     {
