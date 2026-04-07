@@ -384,6 +384,7 @@ export interface Build {
   case?: (number | null) | Case;
   cooler?: (number | null) | Cooler;
   storage?: (number | null) | Storage;
+  tags?: ('gaming' | 'budget' | 'workstation')[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -725,6 +726,7 @@ export interface BuildsSelect<T extends boolean = true> {
   case?: T;
   cooler?: T;
   storage?: T;
+  tags?: T;
   updatedAt?: T;
   createdAt?: T;
 }

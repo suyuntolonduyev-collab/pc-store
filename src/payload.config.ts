@@ -19,6 +19,12 @@ import { Orders } from './collections/Orders'
 import Motherboards from './collections/Motherboards'
 import { Brands } from './collections/Brands'
 
+import { About } from './globals/About'
+import { Contacts } from './globals/Contacts'
+import { FeaturedProductList } from './globals/FeaturedProductList'
+import { Feedback } from './globals/Feedback'
+import { Instruction } from './globals/Instruction'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -53,6 +59,7 @@ export default buildConfig({
     Orders,
     Brands,
   ],
+  globals: [About, Contacts, FeaturedProductList, Feedback, Instruction],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

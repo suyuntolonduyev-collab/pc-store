@@ -100,6 +100,16 @@ export const Builds: CollectionConfig = {
       relationTo: 'storage',
       label: 'Накопитель',
     },
+    {
+      name: 'tags',
+      type: 'select',
+      hasMany: true,
+      options: [
+        { label: 'Для геймеров', value: 'gaming' },
+        { label: 'Бюджетная', value: 'budget' },
+        { label: 'Рабочая станция', value: 'workstation' },
+      ],
+    },
   ],
 
   hooks: {
