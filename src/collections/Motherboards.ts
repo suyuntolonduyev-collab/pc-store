@@ -10,6 +10,9 @@ const Motherboards: CollectionConfig = {
     useAsTitle: 'name', // Используем название модели в качестве заголовка
     defaultColumns: ['name', 'brand', 'price', 'socket', 'stock_quantity'], // Добавляем сокет и количество на складе в отображаемые столбцы
   },
+  access: {
+    read: () => true,
+  },
   fields: [
     {
       name: 'name',

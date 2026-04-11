@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import type { User } from '@/payload-types'
 
 interface AuthState {
@@ -9,144 +9,116 @@ interface AuthState {
   error: string | null
 
   login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, username: string) => Promise<void>
+  register: (name: string, email: string, password: string) => Promise<void>
   logout: () => Promise<void>
   fetchMe: () => Promise<void>
-}
-
-interface LoginResponse {
-  user: User
-  token: string
+  clearError: () => void
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isLoading: false,
       error: null,
 
+      clearError: () => set({ error: null }),
+
       login: async (email, password) => {
         set({ isLoading: true, error: null })
-
         try {
           const res = await fetch('/api/users/login', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
           })
 
+          const data = await res.json()
+
           if (!res.ok) {
-            throw new Error('Login failed')
+            throw new Error(data.errors?.[0]?.message || 'Неверный email или пароль')
           }
 
-          const data: LoginResponse = await res.json()
-
+          set({ user: data.user, token: data.token, isLoading: false })
+        } catch (error) {
           set({
-            user: data.user,
-            token: data.token,
+            error: error instanceof Error ? error.message : 'Ошибка авторизации',
             isLoading: false,
           })
-        } catch (error: unknown) {
-          const message = error instanceof Error ? error.message : 'Unknown error'
-
-          set({
-            error: message,
-            isLoading: false,
-          })
+          throw error
         }
       },
 
-      register: async (email, password, username) => {
+      register: async (name, email, password) => {
         set({ isLoading: true, error: null })
-
         try {
+          // В Payload создание пользователя - это обычный POST в коллекцию
           const res = await fetch('/api/users', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email,
-              password,
-              username,
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            // Передаем обязательные поля из нашей схемы Payload
+            body: JSON.stringify({ name, email, password, role: 'user' }),
           })
+
+          const data = await res.json()
 
           if (!res.ok) {
-            throw new Error('Registration failed')
+            throw new Error(data.errors?.[0]?.message || 'Ошибка при регистрации')
           }
 
-          await useAuthStore.getState().login(email, password)
-
-          set({ isLoading: false })
-        } catch (error: unknown) {
-          const message = error instanceof Error ? error.message : 'Unknown error'
-
+          // Payload по умолчанию логинит юзера после регистрации и возвращает токен
+          set({ user: data.doc, token: data.token, isLoading: false })
+        } catch (error) {
           set({
-            error: message,
+            error: error instanceof Error ? error.message : 'Ошибка регистрации',
             isLoading: false,
           })
+          throw error
         }
       },
 
       logout: async () => {
         set({ isLoading: true, error: null })
-
         try {
-          await fetch('/api/users/logout', {
-            method: 'POST',
-          })
-        } catch (error: unknown) {
-          const message = error instanceof Error ? error.message : 'Logout error'
-
-          set({ error: message })
+          await fetch('/api/users/logout', { method: 'POST' })
+        } catch (error) {
+          console.error('Ошибка при логауте на сервере', error)
         } finally {
-          set({
-            user: null,
-            token: null,
-            isLoading: false,
-          })
+          // В любом случае очищаем локальный стор
+          set({ user: null, token: null, isLoading: false })
         }
       },
 
       fetchMe: async () => {
-        set({ isLoading: true, error: null })
+        const { token } = get()
+        if (!token) return
 
         try {
-          const res = await fetch('/api/users/me')
+          const res = await fetch('/api/users/me', {
+            headers: {
+              Authorization: `JWT ${token}`,
+            },
+          })
 
-          if (!res.ok) {
-            throw new Error('Failed to fetch user')
+          const data = await res.json()
+
+          if (res.ok && data.user) {
+            set({ user: data.user })
+          } else {
+            // Если токен протух или невалиден
+            set({ user: null, token: null })
           }
-
-          const data: { user: User } = await res.json()
-
-          set({
-            user: data.user,
-            isLoading: false,
-          })
-        } catch (error: unknown) {
-          const message = error instanceof Error ? error.message : 'Unknown error'
-
-          set({
-            user: null,
-            token: null,
-            error: message,
-            isLoading: false,
-          })
+        } catch (error) {
+          set({ user: null, token: null })
         }
       },
     }),
     {
       name: 'auth-store',
-      partialize: (state) => ({
-        token: state.token,
-        user: state.user,
-      }),
+      storage: createJSONStorage(() => localStorage),
+      // Сохраняем только токен и юзера, чтобы не кэшировать ошибки или лоадинги
+      partialize: (state) => ({ token: state.token, user: state.user }),
     },
   ),
 )

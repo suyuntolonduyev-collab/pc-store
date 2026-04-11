@@ -9,8 +9,7 @@ interface CartItem {
 
 interface CartState {
   items: CartItem[]
-
-  addItem: (build: Build) => void
+  addItem: (build: Build) => void // ИСПРАВЛЕНО: принимает чистый Build
   removeItem: (buildId: Build['id']) => void
   decreaseItem: (buildId: Build['id']) => void
   clearCart: () => void
@@ -67,7 +66,6 @@ export const useCartStore = create<CartState>()(
         return items.reduce((total, item) => {
           const { build, quantity } = item
 
-          // Список полей, которые мы считаем компонентами
           const components = [
             build.cpu,
             build.mobo,
@@ -80,7 +78,6 @@ export const useCartStore = create<CartState>()(
           ]
 
           const buildPrice = components.reduce((sum: number, comp): number => {
-            // Проверяем, что компонент — это объект (развернутый Relationship) и в нем есть цена
             if (comp && typeof comp === 'object' && 'price' in comp) {
               const price = typeof comp.price === 'number' ? comp.price : 0
               return sum + price

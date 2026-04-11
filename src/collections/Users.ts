@@ -9,7 +9,14 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
   },
-  auth: true,
+  // 1. Возвращаем auth на правильный уровень
+  auth: true, 
+  
+  access: {
+    // Разрешаем регистрацию (создание пользователя) абсолютно всем
+    create: () => true,
+  }, // <--- 2. ВОТ ЭТУ СКОБКУ МЫ ПОТЕРЯЛИ
+  
   fields: [
     {
       name: 'name',
@@ -19,6 +26,7 @@ export const Users: CollectionConfig = {
     {
       name: 'role',
       type: 'select',
+      defaultValue: 'user', // 3. Автоматически даем права обычного юзера при регистрации
       options: [
         { label: 'Admin', value: 'admin' },
         { label: 'user', value: 'user' },

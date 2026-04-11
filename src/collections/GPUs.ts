@@ -11,6 +11,9 @@ export const GPUs: CollectionConfig = {
     useAsTitle: 'name',
     description: 'Видеокарты', // Добавлено описание для админ-панели
   },
+  access: {
+    read: () => true,
+  },
   fields: [
     {
       name: 'name',

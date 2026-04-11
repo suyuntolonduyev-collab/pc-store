@@ -10,6 +10,9 @@ export const RAM: CollectionConfig = {
     useAsTitle: 'name',
     description: 'Оперативная память',
   },
+  access: {
+    read: () => true,
+  },
   // Вынесли fields из labels
   fields: [
     {

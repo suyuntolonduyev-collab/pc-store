@@ -109,8 +109,20 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'ru' | 'ky') | ('en' | 'ru' | 'ky')[];
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    about: About;
+    contacts: Contact;
+    'featured-product-list': FeaturedProductList;
+    feedback: Feedback;
+    instruction: Instruction;
+  };
+  globalsSelect: {
+    about: AboutSelect<false> | AboutSelect<true>;
+    contacts: ContactsSelect<false> | ContactsSelect<true>;
+    'featured-product-list': FeaturedProductListSelect<false> | FeaturedProductListSelect<true>;
+    feedback: FeedbackSelect<false> | FeedbackSelect<true>;
+    instruction: InstructionSelect<false> | InstructionSelect<true>;
+  };
   locale: 'en' | 'ru' | 'ky';
   widgets: {
     collections: CollectionsWidget;
@@ -792,6 +804,176 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about".
+ */
+export interface About {
+  id: number;
+  title: string;
+  description?: string | null;
+  mission?: string | null;
+  founded_year?: number | null;
+  team_size?: number | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts".
+ */
+export interface Contact {
+  id: number;
+  phone?: string | null;
+  email?: string | null;
+  address?: string | null;
+  working_hours?: string | null;
+  telegram?: string | null;
+  whatsapp?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "featured-product-list".
+ */
+export interface FeaturedProductList {
+  id: number;
+  title?: string | null;
+  items?:
+    | {
+        build: number | Build;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "feedback".
+ */
+export interface Feedback {
+  id: number;
+  is_enabled?: boolean | null;
+  recipient_email?: string | null;
+  success_message?: string | null;
+  fields?:
+    | {
+        name: string;
+        type: 'name' | 'email' | 'message';
+        required?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instruction".
+ */
+export interface Instruction {
+  id: number;
+  title: string;
+  intro?: string | null;
+  steps?:
+    | {
+        step_number: number;
+        title: string;
+        description: string;
+        tip?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about_select".
+ */
+export interface AboutSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  mission?: T;
+  founded_year?: T;
+  team_size?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts_select".
+ */
+export interface ContactsSelect<T extends boolean = true> {
+  phone?: T;
+  email?: T;
+  address?: T;
+  working_hours?: T;
+  telegram?: T;
+  whatsapp?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "featured-product-list_select".
+ */
+export interface FeaturedProductListSelect<T extends boolean = true> {
+  title?: T;
+  items?:
+    | T
+    | {
+        build?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "feedback_select".
+ */
+export interface FeedbackSelect<T extends boolean = true> {
+  is_enabled?: T;
+  recipient_email?: T;
+  success_message?: T;
+  fields?:
+    | T
+    | {
+        name?: T;
+        type?: T;
+        required?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instruction_select".
+ */
+export interface InstructionSelect<T extends boolean = true> {
+  title?: T;
+  intro?: T;
+  steps?:
+    | T
+    | {
+        step_number?: T;
+        title?: T;
+        description?: T;
+        tip?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
