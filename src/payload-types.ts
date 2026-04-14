@@ -115,6 +115,7 @@ export interface Config {
     'featured-product-list': FeaturedProductList;
     feedback: Feedback;
     instruction: Instruction;
+    'instruction-configurator': InstructionConfigurator;
   };
   globalsSelect: {
     about: AboutSelect<false> | AboutSelect<true>;
@@ -122,6 +123,7 @@ export interface Config {
     'featured-product-list': FeaturedProductListSelect<false> | FeaturedProductListSelect<true>;
     feedback: FeedbackSelect<false> | FeedbackSelect<true>;
     instruction: InstructionSelect<false> | InstructionSelect<true>;
+    'instruction-configurator': InstructionConfiguratorSelect<false> | InstructionConfiguratorSelect<true>;
   };
   locale: 'en' | 'ru' | 'ky';
   widgets: {
@@ -878,9 +880,32 @@ export interface Instruction {
   id: number;
   title: string;
   intro?: string | null;
+  /**
+   * Рекомендуемый размер: 1920×400 px
+   */
+  banner?: (number | null) | Media;
   steps?:
     | {
-        step_number: number;
+        title: string;
+        description: string;
+        tip?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instruction-configurator".
+ */
+export interface InstructionConfigurator {
+  id: number;
+  title: string;
+  intro?: string | null;
+  banner?: (number | null) | Media;
+  steps?:
+    | {
         title: string;
         description: string;
         tip?: string | null;
@@ -962,10 +987,30 @@ export interface FeedbackSelect<T extends boolean = true> {
 export interface InstructionSelect<T extends boolean = true> {
   title?: T;
   intro?: T;
+  banner?: T;
   steps?:
     | T
     | {
-        step_number?: T;
+        title?: T;
+        description?: T;
+        tip?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instruction-configurator_select".
+ */
+export interface InstructionConfiguratorSelect<T extends boolean = true> {
+  title?: T;
+  intro?: T;
+  banner?: T;
+  steps?:
+    | T
+    | {
         title?: T;
         description?: T;
         tip?: T;

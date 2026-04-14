@@ -1,112 +1,217 @@
-// src/app/(frontend)/instruction/page.tsx
 import { Metadata } from 'next'
+import Link from 'next/link'
+import Image from 'next/image'
+import { notFound } from 'next/navigation'
+import { InstructionStep } from '@/components/instruction/InstructionStep'
+import type { Config } from '@/payload-types' // или '../../../payload-types' — путь уточните
 
-// Временная заглушка, если Payload не инициализирован
-async function getInstruction() {
+// Тип для slug глобалки — все допустимые имена
+type GlobalSlug = keyof Config['globals']
+
+// Локальный тип для данных страницы (соответствует структуре глобалок)
+interface PageData {
+  title: string
+  intro?: string | null
+  banner?: {
+    id: string
+    url: string
+    alt?: string
+    width?: number
+    height?: number
+  } | null
+  steps: {
+    id?: string | null
+    title: string
+    description: string
+    tip?: string | null
+  }[]
+}
+
+async function getInstructionData(slug: GlobalSlug): Promise<PageData> {
   try {
     const { getPayload } = await import('payload')
     const config = (await import('@payload-config')).default
-    
     const payload = await getPayload({ config })
-    const instruction = await payload.findGlobal({
-      slug: 'instruction',
-    })
-    return instruction
+    const data = await payload.findGlobal({ slug })
+    // Приводим к типу PageData (banner может быть Media или ID, но мы ожидаем populated)
+    return data as unknown as PageData
   } catch (error) {
-    console.error('Failed to load instruction:', error)
-    // Возвращаем заглушку для разработки
-    return {
-      title: 'Как собрать компьютер самому?',
-      intro: 'Пошаговая инструкция по сборке ПК',
-      steps: [
-        {
-          step_number: 1,
-          title: 'Инструкция загружается',
-          description: 'Пожалуйста, обновите страницу или проверьте настройки Payload.',
-          tip: 'Убедитесь, что Payload CMS правильно настроен и глобал "instruction" существует.'
-        }
-      ]
+    console.error(`Ошибка загрузки глобалки ${slug}:`, error)
+    throw new Error(`Не удалось загрузить инструкцию (${slug})`)
+  }
+}
+
+export default async function InstructionPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>
+}) {
+  const { tab } = await searchParams
+  const activeTab = tab === 'configurator' ? 'configurator' : 'builder'
+
+  let data: PageData
+  try {
+    if (activeTab === 'configurator') {
+      data = await getInstructionData('instruction-configurator')
+    } else {
+      data = await getInstructionData('instruction')
     }
+  } catch (error) {
+    notFound()
   }
-}
 
-export async function generateMetadata(): Promise<Metadata> {
-  const instruction = await getInstruction()
-  return {
-    title: instruction?.title ? `${instruction.title} | PC-STORE` : 'Инструкция | PC-STORE',
-    description: instruction?.intro?.slice(0, 160) ?? 'Пошаговая инструкция по сборке компьютера',
+  if (!data || !data.steps?.length) {
+    notFound()
   }
-}
 
-function InstructionStep({ step, index }: { step: any; index: number }) {
+  const tabHrefs = {
+    builder: '/instruction?tab=builder',
+    configurator: '/instruction?tab=configurator',
+  }
+
   return (
-    <div className="group relative pl-16 pb-12 last:pb-0">
-      <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white font-bold text-xl group-hover:scale-110 transition-transform">
-        {step.step_number ?? index + 1}
-      </div>
-      <div className="space-y-3">
-        <h3 className="text-xl font-semibold text-gray-900">{step.title}</h3>
-        <p className="text-gray-700 leading-relaxed whitespace-pre-line">{step.description}</p>
-        {step.tip && (
-          <div className="mt-2 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-md">
-            <p className="text-sm text-yellow-800">
-              <span className="font-semibold">💡 Совет:</span> {step.tip}
-            </p>
+    <div className="bg-gray-100 min-h-screen font-sans pb-16">
+      {/* ШАПКА С БАННЕРОМ */}
+      <div className="bg-white shadow-sm mb-8 pb-8 md:pb-10">
+        <div className="max-w-4xl mx-auto">
+          <div className="h-48 md:h-64 w-full relative flex items-center justify-center overflow-hidden md:rounded-b-2xl bg-gray-900">
+            {data.banner?.url ? (
+              <Image
+                src={data.banner.url}
+                alt={data.banner.alt || 'Баннер инструкции'}
+                fill
+                priority
+                className="object-cover opacity-90"
+                sizes="100vw"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-900 via-blue-900 to-purple-900" />
+            )}
+            <span className="relative z-10 text-white/10 text-4xl md:text-6xl font-black tracking-widest uppercase pointer-events-none select-none">
+              {activeTab === 'configurator' ? 'CONFIGURATOR' : 'BUILDER'}
+            </span>
           </div>
-        )}
-      </div>
-    </div>
-  )
-}
 
-export default async function InstructionPage() {
-  const instruction = await getInstruction()
-  
-  if (!instruction || !instruction.steps?.length) {
-    return (
-      <div className="bg-gray-50 min-h-screen py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold mb-4">Инструкция</h1>
-          <p className="text-gray-600">Инструкция временно недоступна. Пожалуйста, зайдите позже.</p>
+          <div className="px-6 relative flex flex-col md:flex-row items-center md:items-start md:-mt-10 md:space-x-6">
+            <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-2xl border-4 border-white shadow-md flex items-center justify-center z-10 -mt-12 md:mt-0 shrink-0 overflow-hidden">
+              <div className="w-full h-full bg-indigo-600 flex items-center justify-center text-white font-extrabold text-4xl">
+                {activeTab === 'configurator' ? '⚙️' : '🖥️'}
+              </div>
+            </div>
+            <div className="mt-5 md:mt-12 flex-1 text-center md:text-left">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                {data.title}
+              </h1>
+              {data.intro && <p className="text-gray-600 font-medium text-lg mt-2">{data.intro}</p>}
+            </div>
+          </div>
+
+          {/* ВКЛАДКИ */}
+          <div className="px-6 mt-8 flex gap-6 border-b border-gray-200">
+            <Link
+              href={tabHrefs.builder}
+              className={`pb-3 font-medium transition-colors ${
+                activeTab === 'builder'
+                  ? 'border-b-2 border-indigo-600 font-bold text-indigo-600'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              Сборка ПК
+            </Link>
+            <Link
+              href={tabHrefs.configurator}
+              className={`pb-3 font-medium transition-colors ${
+                activeTab === 'configurator'
+                  ? 'border-b-2 border-indigo-600 font-bold text-indigo-600'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              Конфигуратор
+            </Link>
+          </div>
         </div>
       </div>
-    )
-  }
 
-  return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{instruction.title}</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">{instruction.intro}</p>
-        </div>
-      </div>
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm p-8 md:p-12">
+      {/* ОСНОВНОЙ КОНТЕНТ */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row gap-6 md:gap-8">
+        {/* САЙДБАР (универсальный для обеих вкладок) */}
+        <aside className="w-full md:w-[320px] shrink-0 space-y-6 md:order-1">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 className="font-bold text-gray-900 mb-5 text-xl tracking-tight">
+              ✅{' '}
+              {activeTab === 'configurator' ? 'Советы по конфигуратору' : 'Чек-лист совместимости'}
+            </h3>
+            <ul className="space-y-3 text-base md:text-lg text-gray-700 font-medium">
+              {activeTab === 'configurator' ? (
+                <>
+                  <li className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="text-green-600">✓</span> Конфигуратор сам фильтрует совместимые
+                    детали
+                  </li>
+                  <li className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="text-green-600">✓</span> Начинайте с выбора процессора
+                  </li>
+                  <li className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="text-green-600">✓</span> Следите за итоговой мощностью БП
+                  </li>
+                  <li className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="text-green-600">✓</span> Можно сохранить сборку в личном
+                    кабинете
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="text-green-600">✓</span> Сокет CPU = Сокет материнской платы
+                  </li>
+                  <li className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="text-green-600">✓</span> Тип ОЗУ (DDR4/DDR5) поддерживается
+                    платой
+                  </li>
+                  <li className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="text-green-600">✓</span> Блок питания с запасом 20-30%
+                  </li>
+                  <li className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <span className="text-green-600">✓</span> Длина видеокарты ≤ размер корпуса
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
+
+          <div className="sticky top-6">
+            <Link
+              href="/builder"
+              className="group block relative rounded-2xl p-[2px] overflow-hidden transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span
+                className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 animate-spin-slow"
+                style={{ animationDuration: '4s' }}
+              />
+              <div className="relative bg-gray-900 rounded-2xl p-8 flex flex-col items-center justify-center text-center overflow-hidden h-full border border-gray-800">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-blue-500/30 blur-[50px] rounded-full pointer-events-none" />
+                <div className="text-4xl mb-4 relative z-10 group-hover:animate-bounce">🚀</div>
+                <h3 className="text-2xl font-black text-white tracking-tight mb-2 relative z-10">
+                  Собрать свой ПК
+                </h3>
+                <p className="text-gray-400 text-sm font-medium mb-6 relative z-10">
+                  Перейти в умный конфигуратор с проверкой совместимости
+                </p>
+                <div className="relative z-10 inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white bg-white/10 rounded-full border border-white/20 group-hover:bg-white/20 transition-colors backdrop-blur-md">
+                  Начать сборку &rarr;
+                </div>
+              </div>
+            </Link>
+          </div>
+        </aside>
+
+        {/* СПИСОК ШАГОВ */}
+        <div className="flex-1 min-w-0 md:order-2">
           <div className="space-y-6">
-            {instruction.steps.map((step, index) => (
+            {data.steps.map((step, index) => (
               <InstructionStep key={step.id ?? index} step={step} index={index} />
             ))}
           </div>
-          <div className="mt-12 pt-8 border-t border-gray-200 text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Готово! 🎉</h3>
-            <p className="text-gray-600">
-              Ваш компьютер собран. Если возникли проблемы — обратитесь в нашу{' '}
-              <a href="/feedback" className="text-blue-600 hover:underline">службу поддержки</a>.
-            </p>
-          </div>
-        </div>
-        <div className="max-w-3xl mx-auto mt-8">
-          <details className="bg-white rounded-lg shadow-sm p-4">
-            <summary className="cursor-pointer font-semibold text-gray-900">📋 Чек-лист для самопроверки</summary>
-            <div className="mt-4 space-y-2 text-gray-700">
-              <label className="flex items-center gap-2"><input type="checkbox" className="rounded" /> Все компоненты распакованы</label>
-              <label className="flex items-center gap-2"><input type="checkbox" className="rounded" /> Термопаста нанесена</label>
-              <label className="flex items-center gap-2"><input type="checkbox" className="rounded" /> Все кабели подключены</label>
-              <label className="flex items-center gap-2"><input type="checkbox" className="rounded" /> Блок питания включён</label>
-              <label className="flex items-center gap-2"><input type="checkbox" className="rounded" /> Монитор подключен к видеокарте</label>
-            </div>
-          </details>
         </div>
       </div>
     </div>

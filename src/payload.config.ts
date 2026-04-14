@@ -24,6 +24,7 @@ import { Contacts } from './components/globals/Contacts'
 import { FeaturedProductList } from './components/globals/FeaturedProductList'
 import { Feedback } from './components/globals/Feedback'
 import { Instruction } from './components/globals/Instruction'
+import { InstructionConfigurator } from '@/components/globals/instructionConfigurator'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -59,7 +60,7 @@ export default buildConfig({
     Orders,
     Brands,
   ],
-  globals: [About, Contacts, FeaturedProductList, Feedback, Instruction],
+  globals: [About, Contacts, FeaturedProductList, Feedback, Instruction, InstructionConfigurator],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

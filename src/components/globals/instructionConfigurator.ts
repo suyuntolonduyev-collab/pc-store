@@ -1,11 +1,10 @@
-// src/components/globals/instruction.ts
 import type { GlobalConfig } from 'payload'
 
-export const Instruction: GlobalConfig = {
-  slug: 'instruction',
-  label: 'Инструкция',
+export const InstructionConfigurator: GlobalConfig = {
+  slug: 'instruction-configurator',
+  label: 'Инструкция для конфигуратора',
   access: {
-    read: () => true, // Публичный доступ для всех
+    read: () => true,
   },
   fields: [
     {
@@ -13,23 +12,20 @@ export const Instruction: GlobalConfig = {
       type: 'text',
       label: 'Заголовок страницы',
       required: true,
-      defaultValue: 'Инструкция к Конфигуратору',
+      defaultValue: 'Как пользоваться конфигуратором',
     },
     {
       name: 'intro',
       type: 'textarea',
-      label: 'Вводный текст (подзаголовок)',
+      label: 'Вводный текст',
       required: false,
     },
     {
       name: 'banner',
       type: 'upload',
-      label: 'Баннер (фоновое изображение)',
-      relationTo: 'media', // связь с коллекцией Media
+      label: 'Баннер',
+      relationTo: 'media',
       required: false,
-      admin: {
-        description: 'Рекомендуемый размер: 1920×400 px',
-      },
     },
     {
       name: 'steps',
@@ -55,10 +51,13 @@ export const Instruction: GlobalConfig = {
         {
           name: 'tip',
           type: 'text',
-          label: 'Совет эксперта (опционально)',
+          label: 'Совет эксперта',
           required: false,
         },
       ],
+      admin: {
+        initCollapsed: false,
+      },
     },
   ],
 }

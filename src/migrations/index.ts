@@ -4,6 +4,7 @@ import * as migration_20260325_100836_recreate_the_3rd_commit from './20260325_1
 import * as migration_20260326_132912_fixed from './20260326_132912_fixed';
 import * as migration_20260406_103024_added_new_poles_ofr_the from './20260406_103024_added_new_poles_ofr_the';
 import * as migration_20260407_055052_added_all_globals from './20260407_055052_added_all_globals';
+import * as migration_20260414_175247_Upgrt_instruction_code_section from './20260414_175247_Upgrt_instruction_code_section';
 
 export const migrations = [
   {
@@ -34,6 +35,11 @@ export const migrations = [
   {
     up: migration_20260407_055052_added_all_globals.up,
     down: migration_20260407_055052_added_all_globals.down,
-    name: '20260407_055052_added_all_globals'
+    name: '20260407_055052_added_all_globals',
+  },
+  {
+    up: migration_20260414_175247_Upgrt_instruction_code_section.up,
+    down: migration_20260414_175247_Upgrt_instruction_code_section.down,
+    name: '20260414_175247_Upgrt_instruction_code_section'
   },
 ];

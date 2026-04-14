@@ -41,7 +41,7 @@ export default function BuilderPage() {
   const totalPrice = getTotalPrice()
   const isComplete = isBuildComplete()
 
-  // штука которую я делаю для оптимизации рендера модалки и передачи колбеков в ComponentSlot
+  // штука которую я делаю для оптимизации рендера модалки и оптимизации ComponentSlot
   const handleOpenModal = useCallback((slot: keyof BuildSlots) => {
     setActiveSlot(slot)
   }, [])
