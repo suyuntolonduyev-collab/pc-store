@@ -12,6 +12,10 @@ export default function Header() {
   // Состояние для защиты от Hydration Mismatch
   const [isMounted, setIsMounted] = useState(false)
 
+  const totalItems = useCartStore((state) =>
+    state.items.reduce((acc, item) => acc + item.quantity, 0),
+  )
+
   // Селекторы Zustand
   const items = useCartStore((state) => state.items)
   const user = useAuthStore((state) => state.user)

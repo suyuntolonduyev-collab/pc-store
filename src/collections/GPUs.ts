@@ -85,5 +85,33 @@ export const GPUs: CollectionConfig = {
       label: 'Наличие 16-pin разъема питания',
       defaultValue: false,
     },
+    {
+      name: 'fps_presets',
+      label: 'FPS Пресеты (1080p, Высокие настройки)',
+      type: 'group',
+      fields: [
+        {
+          name: 'esports',
+          label: 'Киберспорт (CS2, Valorant)',
+          type: 'number',
+          required: true,
+          defaultValue: 240,
+        },
+        {
+          name: 'aaa',
+          label: 'AAA-игры (Cyberpunk, Alan Wake 2)',
+          type: 'number',
+          required: true,
+          defaultValue: 85,
+        },
+        {
+          name: 'casual',
+          label: 'Популярные (GTA V, Minecraft)',
+          type: 'number',
+          required: true,
+          defaultValue: 160,
+        },
+      ],
+    },
   ],
 }

@@ -250,6 +250,7 @@ export interface Processor {
   supports_ddr4?: boolean | null;
   supports_ddr5?: boolean | null;
   has_graphics?: boolean | null;
+  fps_multiplier: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -271,6 +272,11 @@ export interface Gpus {
   recommended_psu_w: number;
   connector_8pin: number;
   connector_16pin?: boolean | null;
+  fps_presets: {
+    esports: number;
+    aaa: number;
+    casual: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -612,6 +618,7 @@ export interface ProcessorsSelect<T extends boolean = true> {
   supports_ddr4?: T;
   supports_ddr5?: T;
   has_graphics?: T;
+  fps_multiplier?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -630,6 +637,13 @@ export interface GpusSelect<T extends boolean = true> {
   recommended_psu_w?: T;
   connector_8pin?: T;
   connector_16pin?: T;
+  fps_presets?:
+    | T
+    | {
+        esports?: T;
+        aaa?: T;
+        casual?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

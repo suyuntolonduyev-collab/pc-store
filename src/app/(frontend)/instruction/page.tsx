@@ -8,6 +8,11 @@ import type { Config } from '@/payload-types' // или '../../../payload-types'
 // Тип для slug глобалки — все допустимые имена
 type GlobalSlug = keyof Config['globals']
 
+export const metadata: Metadata = {
+  title: 'ИНструкции | Собери свой идеальный компьютер',
+  description: 'Иструкции по зборке ПК и использованию конфигуратора от PCBuilder',
+}
+
 // Локальный тип для данных страницы (соответствует структуре глобалок)
 interface PageData {
   title: string
@@ -90,20 +95,6 @@ export default async function InstructionPage({
             <span className="relative z-10 text-white/10 text-4xl md:text-6xl font-black tracking-widest uppercase pointer-events-none select-none">
               {activeTab === 'configurator' ? 'CONFIGURATOR' : 'BUILDER'}
             </span>
-          </div>
-
-          <div className="px-6 relative flex flex-col md:flex-row items-center md:items-start md:-mt-10 md:space-x-6">
-            <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-2xl border-4 border-white shadow-md flex items-center justify-center z-10 -mt-12 md:mt-0 shrink-0 overflow-hidden">
-              <div className="w-full h-full bg-indigo-600 flex items-center justify-center text-white font-extrabold text-4xl">
-                {activeTab === 'configurator' ? '⚙️' : '🖥️'}
-              </div>
-            </div>
-            <div className="mt-5 md:mt-12 flex-1 text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
-                {data.title}
-              </h1>
-              {data.intro && <p className="text-gray-600 font-medium text-lg mt-2">{data.intro}</p>}
-            </div>
           </div>
 
           {/* ВКЛАДКИ */}

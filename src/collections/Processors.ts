@@ -115,6 +115,13 @@ export const Processors: CollectionConfig = {
           label: 'Встроенное видеоядро',
           defaultValue: true,
         },
+        {
+          name: 'fps_multiplier',
+          label: 'Множитель FPS (от 0.7 до 1.2)',
+          type: 'number',
+          defaultValue: 1.0,
+          required: true,
+        },
       ],
     },
   ],
