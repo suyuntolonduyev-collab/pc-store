@@ -6,6 +6,7 @@ import * as migration_20260406_103024_added_new_poles_ofr_the from './20260406_1
 import * as migration_20260407_055052_added_all_globals from './20260407_055052_added_all_globals';
 import * as migration_20260414_175247_Upgrt_instruction_code_section from './20260414_175247_Upgrt_instruction_code_section';
 import * as migration_20260415_095429_added_fps_counter from './20260415_095429_added_fps_counter';
+import * as migration_20260421_045008_added_accesories_collection from './20260421_045008_added_accesories_collection';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20260415_095429_added_fps_counter.up,
     down: migration_20260415_095429_added_fps_counter.down,
-    name: '20260415_095429_added_fps_counter'
+    name: '20260415_095429_added_fps_counter',
+  },
+  {
+    up: migration_20260421_045008_added_accesories_collection.up,
+    down: migration_20260421_045008_added_accesories_collection.down,
+    name: '20260421_045008_added_accesories_collection'
   },
 ];

@@ -19,12 +19,16 @@ import { Orders } from './collections/Orders'
 import Motherboards from './collections/Motherboards'
 import { Brands } from './collections/Brands'
 
+import { Accessories } from './collections/Accessories'
+
 import { About } from './components/globals/About'
 import { Contacts } from './components/globals/Contacts'
 import { FeaturedProductList } from './components/globals/FeaturedProductList'
 import { Feedback } from './components/globals/Feedback'
 import { Instruction } from './components/globals/Instruction'
 import { InstructionConfigurator } from '@/components/globals/instructionConfigurator'
+
+import createPayment from './endpoints/createPayment'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -59,6 +63,14 @@ export default buildConfig({
     Builds,
     Orders,
     Brands,
+    Accessories,
+  ],
+  endpoints: [
+    {
+      path: '/create-payment',
+      method: 'post',
+      handler: createPayment,
+    },
   ],
   globals: [About, Contacts, FeaturedProductList, Feedback, Instruction, InstructionConfigurator],
   editor: lexicalEditor(),

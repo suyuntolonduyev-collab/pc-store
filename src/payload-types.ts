@@ -80,6 +80,7 @@ export interface Config {
     builds: Build;
     orders: Order;
     brands: Brand;
+    accessories: Accessory;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -100,6 +101,7 @@ export interface Config {
     builds: BuildsSelect<false> | BuildsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     brands: BrandsSelect<false> | BrandsSelect<true>;
+    accessories: AccessoriesSelect<false> | AccessoriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -422,6 +424,20 @@ export interface Order {
   createdAt: string;
 }
 /**
+ * Сопутствующие товары: мониторы, клавиатуры, мыши, ПО, гарантии.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accessories".
+ */
+export interface Accessory {
+  id: number;
+  name: string;
+  price: number;
+  image?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -496,6 +512,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'brands';
         value: number | Brand;
+      } | null)
+    | ({
+        relationTo: 'accessories';
+        value: number | Accessory;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -778,6 +798,17 @@ export interface BrandsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   logo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accessories_select".
+ */
+export interface AccessoriesSelect<T extends boolean = true> {
+  name?: T;
+  price?: T;
+  image?: T;
   updatedAt?: T;
   createdAt?: T;
 }

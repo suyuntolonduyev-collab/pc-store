@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ReactNode } from 'react'
 import { BuilderHydrationGuard } from './BuilderHydrationGuard'
+import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
   title: 'Конфигуратор ПК | Собери свой идеальный компьютер',
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 }
 
 export default function BuilderLayout({ children }: { children: ReactNode }) {
-  return <BuilderHydrationGuard>{children}</BuilderHydrationGuard>
+  return (
+    <BuilderHydrationGuard>
+      {children}
+      <Toaster />
+    </BuilderHydrationGuard>
+  )
 }

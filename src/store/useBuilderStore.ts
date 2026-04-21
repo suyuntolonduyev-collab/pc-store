@@ -34,10 +34,11 @@ interface BuilderState {
   build: BuildSlots
   _hasHydrated: boolean
   setHasHydrated: (state: boolean) => void
-  // 1. Восстановлена строгая дженерик-сигнатура
   selectComponent: <K extends keyof BuildSlots>(slot: K, component: BuildSlots[K]) => void
   removeComponent: (slot: keyof BuildSlots) => void
   resetBuild: () => void
+  // 🟢 ДОБАВЛЯЕМ НОВЫЙ МЕТОД В ИНТЕРФЕЙС
+  setBuild: (build: BuildSlots) => void
   getCompatibilityErrors: () => ReturnType<typeof checkCompatibility>
   calculateTotalPrice: () => number
   getTotalWattage: () => number
@@ -68,11 +69,8 @@ export const useBuilderStore = create<BuilderState>()(
       selectComponent: (slot, component) => {
         const { build } = get()
 
-        // 2. TS теперь корректно выводит тип (без `as BuildSlots`)
         const updatedBuild: BuildSlots = { ...build, [slot]: component }
 
-        // 3. Сужение типа (as Motherboard) теперь безопасно, так как мы внутри проверки слота,
-        // а дженерик гарантирует, что в слот mobo передали именно Motherboard
         if (slot === 'mobo' && build.ram) {
           const newMobo = component as Motherboard
           const currentRam = build.ram
@@ -108,6 +106,12 @@ export const useBuilderStore = create<BuilderState>()(
         set({ build: initialBuild })
       },
 
+      // 🟢 РЕАЛИЗАЦИЯ НОВОГО МЕТОДА
+      // Он просто заменяет текущее состояние сборки на то, что ему передали
+      setBuild: (build) => {
+        set({ build })
+      },
+
       getCompatibilityErrors: () => {
         const { build } = get()
         return checkCompatibility(build)
@@ -125,15 +129,10 @@ export const useBuilderStore = create<BuilderState>()(
 
       getTotalWattage: () => {
         const { build } = get()
-
         const cpuPower = build.cpu?.tdp ?? 0
-
-        // 4. Используем константу вместо магического числа 0.4
         const gpuPower = build.gpu?.recommended_psu_w
           ? build.gpu.recommended_psu_w * GPU_POWER_SHARE
           : 0
-
-        // 5. Используем константы для базы (50W) и запаса (1.3)
         return (cpuPower + gpuPower + SYSTEM_BASE_POWER_W) * POWER_HEADROOM_MULTIPLIER
       },
 
@@ -165,9 +164,6 @@ export const useBuilderStore = create<BuilderState>()(
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          if (state.build.gpu && !state.build.gpu.fps_presets) {
-            state.build.gpu = null
-          }
           state.setHasHydrated(true)
         }
       },
