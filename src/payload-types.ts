@@ -417,8 +417,17 @@ export interface Build {
 export interface Order {
   id: number;
   user: number | User;
-  build: number | Build;
+  contactName: string;
+  phone: string;
+  address: string;
   status: 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+  items: {
+    type: 'build' | 'accessory';
+    build?: (number | null) | Build;
+    accessory?: (number | null) | Accessory;
+    quantity: number;
+    id?: string | null;
+  }[];
   total_price: number;
   updatedAt: string;
   createdAt: string;
@@ -784,8 +793,19 @@ export interface BuildsSelect<T extends boolean = true> {
  */
 export interface OrdersSelect<T extends boolean = true> {
   user?: T;
-  build?: T;
+  contactName?: T;
+  phone?: T;
+  address?: T;
   status?: T;
+  items?:
+    | T
+    | {
+        type?: T;
+        build?: T;
+        accessory?: T;
+        quantity?: T;
+        id?: T;
+      };
   total_price?: T;
   updatedAt?: T;
   createdAt?: T;

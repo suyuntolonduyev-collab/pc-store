@@ -11,6 +11,7 @@ export default function AddToCartBtn({ disabled }: { disabled: boolean }) {
   const addItem = useCartStore((s) => s.addItem)
 
   const handleAddToCart = () => {
+    // Создаем локальный объект сборки с временным ID
     const localBuild = {
       id: Date.now(),
       name: `Сборка ПК — ${new Date().toLocaleDateString()}`,
@@ -26,19 +27,18 @@ export default function AddToCartBtn({ disabled }: { disabled: boolean }) {
       tags: ['gaming'],
     } as unknown as Build
 
-    // Добавляем в корзину с учетом новой структуры (type: 'build')
+    // Мгновенно добавляем в Zustand корзину
     addItem({ type: 'build', product: localBuild })
 
     toast.success('Сборка добавлена в корзину!')
     resetBuild()
   }
 
-  // 🟢 Добавлен явный return. Теперь это валидный React-компонент.
   return (
     <button
       onClick={handleAddToCart}
-      disabled={disabled}
-      className="w-full py-3.5 px-5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 transition-colors duration-300 rounded-xl text-white font-semibold cursor-pointer shadow-sm disabled:shadow-none"
+      disabled={disabled} // ⚠️ Кнопка будет серой, пока вы не выберете ВСЕ детали!
+      className="w-full py-3.5 px-5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 transition-colors duration-300 rounded-xl text-white font-semibold cursor-pointer shadow-sm disabled:shadow-none flex justify-center items-center"
     >
       Добавить в корзину
     </button>
