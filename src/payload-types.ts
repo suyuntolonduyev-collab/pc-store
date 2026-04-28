@@ -81,6 +81,8 @@ export interface Config {
     orders: Order;
     brands: Brand;
     accessories: Accessory;
+    wishlist: Wishlist;
+    posts: Post;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -102,6 +104,8 @@ export interface Config {
     orders: OrdersSelect<false> | OrdersSelect<true>;
     brands: BrandsSelect<false> | BrandsSelect<true>;
     accessories: AccessoriesSelect<false> | AccessoriesSelect<true>;
+    wishlist: WishlistSelect<false> | WishlistSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -448,6 +452,53 @@ export interface Accessory {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wishlist".
+ */
+export interface Wishlist {
+  id: number;
+  user: number | User;
+  build?: (number | null) | Build;
+  accessory?: (number | null) | Accessory;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  image?: (number | null) | Media;
+  category?: ('news' | 'reviews' | 'guides') | null;
+  tags?:
+    | {
+        tag?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -525,6 +576,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'accessories';
         value: number | Accessory;
+      } | null)
+    | ({
+        relationTo: 'wishlist';
+        value: number | Wishlist;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -829,6 +888,37 @@ export interface AccessoriesSelect<T extends boolean = true> {
   name?: T;
   price?: T;
   image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wishlist_select".
+ */
+export interface WishlistSelect<T extends boolean = true> {
+  user?: T;
+  build?: T;
+  accessory?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  excerpt?: T;
+  content?: T;
+  image?: T;
+  category?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

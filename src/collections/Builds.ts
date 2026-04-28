@@ -23,13 +23,14 @@ export const Builds: CollectionConfig = {
   },
 
   access: {
-    read: ({ req }) => isAdminOrOwner(req),
+    // 🟢 Читать могут ВСЕ (нужно для Главной страницы и шеринга сборок по ссылке)
+    read: () => true,
+
+    // 🔒 Изменять и удалять — ТОЛЬКО владельцы и админы (ваша защита)
     update: ({ req }) => isAdminOrOwner(req),
     delete: ({ req }) => isAdminOrOwner(req),
-
     create: ({ req }) => !!req.user,
   },
-
   fields: [
     {
       name: 'user',

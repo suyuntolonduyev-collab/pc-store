@@ -20,6 +20,8 @@ import Motherboards from './collections/Motherboards'
 import { Brands } from './collections/Brands'
 
 import { Accessories } from './collections/Accessories'
+import { Wishlist } from './collections/Wishlist'
+import { Posts } from './collections/Posts'
 
 import { About } from './components/globals/About'
 import { Contacts } from './components/globals/Contacts'
@@ -64,6 +66,8 @@ export default buildConfig({
     Orders,
     Brands,
     Accessories,
+    Wishlist,
+    Posts,
   ],
   endpoints: [
     {

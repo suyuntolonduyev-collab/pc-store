@@ -1,6 +1,7 @@
 import React from 'react'
 import './globals.css'
 import Header from '@/components/header/Header'
+import Footer from '@/components/Footer'
 
 export const metadata = {
   description: 'A blank template using Payload in a Next.js app.',
@@ -12,7 +13,8 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
     <html lang="ru">
       <body suppressHydrationWarning>
         <Header />
-        <main>{children}</main>
+        <main className="flex-grow">{children}</main>
+        <Footer />
       </body>
     </html>
   )

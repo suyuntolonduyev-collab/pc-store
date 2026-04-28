@@ -8,13 +8,7 @@ import { useAuthStore } from '@/store/useAuthStore'
 
 export default function Header() {
   const pathname = usePathname()
-
-  // Состояние для защиты от Hydration Mismatch
   const [isMounted, setIsMounted] = useState(false)
-
-  const totalItems = useCartStore((state) =>
-    state.items.reduce((acc, item) => acc + item.quantity, 0),
-  )
 
   // Селекторы Zustand
   const items = useCartStore((state) => state.items)
@@ -43,6 +37,15 @@ export default function Header() {
           {/* Основная навигация */}
           <nav className="hidden md:flex items-center gap-6">
             <Link
+              href="/catalog"
+              className={`text-sm font-medium transition-colors ${
+                pathname === '/catalog' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Каталог
+            </Link>
+
+            <Link
               href="/builder"
               className={`text-sm font-medium transition-colors ${
                 pathname === '/builder' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'
@@ -67,13 +70,21 @@ export default function Header() {
           {/* Блок авторизации */}
           <div className="hidden sm:flex items-center gap-4 text-sm">
             {!isMounted ? (
-              // Скелетон на время гидратации, чтобы верстка не прыгала
-              <div className="w-24 h-5 bg-gray-100 animate-pulse rounded"></div>
+              // Скелетон на время гидратации
+              <div className="w-32 h-5 bg-gray-100 animate-pulse rounded"></div>
             ) : user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-gray-600">
-                  Привет, <span className="font-semibold text-gray-900">{user.name}</span>
-                </span>
+              <div className="flex items-center gap-5">
+                <Link
+                  href="/profile"
+                  className={`flex items-center gap-2 transition-colors ${
+                    pathname === '/profile' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                  }`}
+                >
+                  <span>
+                    Привет, <span className="font-semibold">{user.name}</span>
+                  </span>
+                </Link>
+                <div className="h-4 w-px bg-gray-300"></div>
                 <button
                   onClick={logout}
                   className="text-gray-500 hover:text-red-600 transition-colors font-medium"
@@ -105,7 +116,9 @@ export default function Header() {
           {/* Корзина */}
           <Link
             href="/cart"
-            className="relative flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors group p-2 -m-2"
+            className={`relative flex items-center gap-2 transition-colors group p-2 -m-2 ${
+              pathname === '/cart' ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'
+            }`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

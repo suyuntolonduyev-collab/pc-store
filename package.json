@@ -7,7 +7,7 @@
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "dev:legacy": "cross-env NODE_OPTIONS=--no-deprecation next dev --webpack",
+    "dev:legacy": "cross-env NODE_OPTIONS='--no-deprecation --max-old-space-size=8192 --max-semi-space-size=256' next dev --webpack",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
@@ -29,7 +29,9 @@
     "@payloadcms/ui": "3.80.0",
     "@tailwindcss/postcss": "^4.2.2",
     "cross-env": "^7.0.3",
+    "framer-motion": "^12.38.0",
     "graphql": "^16.8.1",
+    "lucide-react": "^1.11.0",
     "next": "16.2.1",
     "payload": "3.80.0",
     "postcss": "^8.5.8",
@@ -39,6 +41,7 @@
     "react-intersection-observer": "^10.0.3",
     "stripe": "^22.0.2",
     "tailwindcss": "^4.2.2",
+    "zod": "^4.3.6",
     "zustand": "^5.0.12"
   },
   "devDependencies": {

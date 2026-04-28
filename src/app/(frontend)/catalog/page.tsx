@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
 import { useCartStore } from '@/store/useCartStore'
@@ -9,7 +10,7 @@ import type { BuildSlots } from '@/store/useBuilderStore'
 import formatPrice from '@/utils/formatPrice'
 import { useDebounce } from '@/hooks/useDebounce'
 import QuickViewModal from './QuickViewModal'
-import type { Build, Media } from '@/payload-types'
+import type { Build, Media, Accessory } from '@/payload-types'
 import type { CatalogItem } from '@/types/catalog'
 
 interface Brand {
@@ -17,24 +18,62 @@ interface Brand {
   name: string
 }
 
-// Проверить испраность фильтера цены *от *до
+type CategoryConfig = {
+  id: string
+  label: string
+  collection: string
+  type: 'component' | 'accessory'
+  slotKey?: keyof BuildSlots
+}
 
-const CATEGORIES: { id: string; label: string; collection: string; slotKey: keyof BuildSlots }[] = [
-  { id: 'cpu', label: 'Процессоры', collection: 'processors', slotKey: 'cpu' },
-  { id: 'gpu', label: 'Видеокарты', collection: 'gpus', slotKey: 'gpu' },
-  { id: 'mobo', label: 'Материнские платы', collection: 'motherboards', slotKey: 'mobo' },
-  { id: 'ram', label: 'Оперативная память', collection: 'ram', slotKey: 'ram' },
-  { id: 'storage', label: 'Накопители', collection: 'storage', slotKey: 'storage' },
-  { id: 'psu', label: 'Блоки питания', collection: 'psus', slotKey: 'psu' },
-  { id: 'cooler', label: 'Охлаждение', collection: 'coolers', slotKey: 'cooler' },
-  { id: 'case', label: 'Корпуса', collection: 'cases', slotKey: 'case' },
+const CATEGORIES: CategoryConfig[] = [
+  { id: 'cpu', label: 'Процессоры', collection: 'processors', type: 'component', slotKey: 'cpu' },
+  { id: 'gpu', label: 'Видеокарты', collection: 'gpus', type: 'component', slotKey: 'gpu' },
+  {
+    id: 'mobo',
+    label: 'Материнские платы',
+    collection: 'motherboards',
+    type: 'component',
+    slotKey: 'mobo',
+  },
+  { id: 'ram', label: 'Оперативная память', collection: 'ram', type: 'component', slotKey: 'ram' },
+  {
+    id: 'storage',
+    label: 'Накопители',
+    collection: 'storage',
+    type: 'component',
+    slotKey: 'storage',
+  },
+  { id: 'psu', label: 'Блоки питания', collection: 'psus', type: 'component', slotKey: 'psu' },
+  {
+    id: 'cooler',
+    label: 'Охлаждение',
+    collection: 'coolers',
+    type: 'component',
+    slotKey: 'cooler',
+  },
+  { id: 'case', label: 'Корпуса', collection: 'cases', type: 'component', slotKey: 'case' },
+  {
+    id: 'accessories',
+    label: 'Периферия и аксессуары',
+    collection: 'accessories',
+    type: 'accessory',
+  },
 ]
 
 const SKELETON_KEYS = Array.from({ length: 8 }, (_, i) => `skel-${i + 1}`)
 const PAGE_SIZE = 12
 
-export default function CatalogPage() {
-  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0])
+// Выносим основную логику в отдельный компонент для обертки Suspense
+function CatalogContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // 1. Читаем параметр ?category из URL при первой загрузке
+  const categoryParam = searchParams.get('category')
+  const initialCategory = CATEGORIES.find((c) => c.id === categoryParam) || CATEGORIES[0]
+
+  const [activeCategory, setActiveCategory] = useState<CategoryConfig>(initialCategory)
   const [items, setItems] = useState<CatalogItem[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
   const [selectedBrandId, setSelectedBrandId] = useState<string>('all')
@@ -55,6 +94,30 @@ export default function CatalogPage() {
   const addItemToCart = useCartStore((state) => state.addItem)
   const { ref, inView } = useInView({ threshold: 0 })
 
+  // Синхронизация с URL при нажатии кнопки "Назад" в браузере
+  useEffect(() => {
+    const catId = searchParams.get('category')
+    if (catId) {
+      const cat = CATEGORIES.find((c) => c.id === catId)
+      if (cat && cat.id !== activeCategory.id) {
+        setActiveCategory(cat)
+      }
+    }
+  }, [searchParams])
+
+  // 2. Функция смены категории (обновляет и стейт, и URL без перезагрузки)
+  const handleCategoryChange = (category: CategoryConfig) => {
+    setActiveCategory(category)
+    setSelectedBrandId('all')
+    setSearchTerm('')
+    setPriceRange({ min: '', max: '' })
+
+    // Обновляем URL
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('category', category.id)
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
+
   useEffect(() => {
     const fetchBrands = async () => {
       try {
@@ -63,7 +126,9 @@ export default function CatalogPage() {
           const data = await res.json()
           setBrands(data.docs)
         }
-      } catch (e) {}
+      } catch (e) {
+        // Ошибка обрабатывается молча
+      }
     }
     fetchBrands()
   }, [])
@@ -77,21 +142,27 @@ export default function CatalogPage() {
       try {
         let url = `/api/${activeCategory.collection}?limit=${PAGE_SIZE}&page=${pageToLoad}&sort=${sort}&depth=1`
 
+        let andIndex = 0
+
         if (debouncedSearchTerm) {
-          url += `&where[name][like]=${encodeURIComponent(debouncedSearchTerm)}`
+          url += `&where[and][${andIndex}][name][like]=${encodeURIComponent(debouncedSearchTerm)}`
+          andIndex++
         }
         if (debouncedPriceRange.min) {
-          url += `&where[price][greater_than_or_equal]=${debouncedPriceRange.min}`
+          url += `&where[and][${andIndex}][price][greater_than_equal]=${Number(debouncedPriceRange.min)}`
+          andIndex++
         }
         if (debouncedPriceRange.max) {
-          url += `&where[price][less_than_or_equal]=${debouncedPriceRange.max}`
+          url += `&where[and][${andIndex}][price][less_than_equal]=${Number(debouncedPriceRange.max)}`
+          andIndex++
         }
-        if (selectedBrandId !== 'all') {
-          url += `&where[brand][equals]=${Number(selectedBrandId)}`
+        if (selectedBrandId !== 'all' && activeCategory.type === 'component') {
+          url += `&where[and][${andIndex}][brand][equals]=${Number(selectedBrandId)}`
+          andIndex++
         }
 
         const res = await fetch(url)
-        if (!res.ok) throw new Error('Ошибка загрузки каталога')
+        if (!res.ok) throw new Error('Ошибка загрузки каталога (проверьте параметры фильтра)')
 
         const data = await res.json()
         setItems((prev) => (reset ? data.docs : [...prev, ...data.docs]))
@@ -103,31 +174,43 @@ export default function CatalogPage() {
         setIsLoadingMore(false)
       }
     },
-    [activeCategory.collection, sort, debouncedSearchTerm, debouncedPriceRange, selectedBrandId],
+    [
+      activeCategory.collection,
+      activeCategory.type,
+      sort,
+      debouncedSearchTerm,
+      debouncedPriceRange,
+      selectedBrandId,
+    ],
   )
 
   useEffect(() => {
     setPage(1)
     setItems([])
     fetchItems(1, true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory.id, sort, debouncedSearchTerm, debouncedPriceRange, selectedBrandId])
 
-  // 4. Триггер бесконечной прокрутки
   useEffect(() => {
     if (inView && hasNextPage && !isLoading && !isLoadingMore) setPage((prev) => prev + 1)
   }, [inView, hasNextPage, isLoading, isLoadingMore])
 
-  // 5. Загрузка следующей страницы
   useEffect(() => {
     if (page > 1) fetchItems(page, false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page])
 
-  // 6. Добавление товара в корзину
-  const handleAddToCart = (item: CatalogItem) => {
-    // Мгновенное добавление одиночного товара в корзину
+  const handleAddToCart = async (item: CatalogItem) => {
+    if (activeCategory.type === 'accessory') {
+      addItemToCart({ type: 'accessory', product: item as unknown as Accessory })
+      toast.success('Аксессуар добавлен в корзину!')
+      return
+    }
+
+    if (!activeCategory.slotKey) return
+
     const localBuild = {
-      id: Date.now(), // Временный ID
+      id: Date.now(),
       name: `Товар: ${item.name}`,
       is_complete: false,
       tags: ['component'],
@@ -146,20 +229,19 @@ export default function CatalogPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 sm:px-0">
+    <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Каталог комплектующих</h1>
-        <p className="text-gray-500">Настройте фильтры, чтобы найти идеальную деталь.</p>
+        <p className="text-gray-500">
+          Настройте фильтры, чтобы найти идеальную деталь или аксессуар.
+        </p>
       </div>
 
       <div className="flex overflow-x-auto custom-scrollbar pb-2 gap-2 mb-6 border-b border-gray-100">
         {CATEGORIES.map((category) => (
           <button
             key={category.id}
-            onClick={() => {
-              setActiveCategory(category)
-              setSelectedBrandId('all')
-            }}
+            onClick={() => handleCategoryChange(category)} // 3. Используем новую функцию
             className={`whitespace-nowrap px-4 py-2 rounded-lg font-medium transition-colors text-sm ${activeCategory.id === category.id ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
           >
             {category.label}
@@ -191,18 +273,22 @@ export default function CatalogPage() {
           </svg>
         </div>
 
-        <select
-          value={selectedBrandId}
-          onChange={(e) => setSelectedBrandId(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="all">Все производители</option>
-          {brands.map((brand) => (
-            <option key={brand.id} value={brand.id}>
-              {brand.name}
-            </option>
-          ))}
-        </select>
+        {activeCategory.type === 'component' ? (
+          <select
+            value={selectedBrandId}
+            onChange={(e) => setSelectedBrandId(e.target.value)}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">Все производители</option>
+            {brands.map((brand) => (
+              <option key={brand.id} value={brand.id}>
+                {brand.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <div className="hidden lg:block"></div>
+        )}
 
         <div className="flex items-center gap-2">
           <input
@@ -265,6 +351,7 @@ export default function CatalogPage() {
                   ? ((item.image as Media).url ?? null)
                   : null
               const isLastItem = index === items.length - 1
+
               return (
                 <div
                   key={item.id}
@@ -336,6 +423,23 @@ export default function CatalogPage() {
           onAddToCart={handleAddToCart}
         />
       )}
+    </>
+  )
+}
+
+// Обертка Suspense обязательна для компонентов, использующих useSearchParams
+export default function CatalogPage() {
+  return (
+    <div className="container mx-auto py-8 px-4 sm:px-0">
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        }
+      >
+        <CatalogContent />
+      </Suspense>
     </div>
   )
 }

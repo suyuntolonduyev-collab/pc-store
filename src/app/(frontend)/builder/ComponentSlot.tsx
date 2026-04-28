@@ -16,18 +16,17 @@ interface ComponentBase {
 
 interface ComponentSlotProps {
   title: string
-  // 2. Оставим slotKey для потенциального использования в aria-атрибутах
-  // или test-id, чтобы он не висел "мертвым грузом"
   slotKey: keyof BuildSlots
   item: ComponentValue | null
-  hasError?: boolean
+  errorMessages?: string[] // 👈 Вот это свойство отсутствовало
   onOpenModal: () => void
   onRemove: () => void
 }
 
 const ComponentSlot = memo(
-  ({ title, slotKey, item, hasError, onOpenModal, onRemove }: ComponentSlotProps) => {
+  ({ title, slotKey, item, errorMessages = [], onOpenModal, onRemove }: ComponentSlotProps) => {
     const base = item as unknown as ComponentBase | null
+    const hasError = errorMessages.length > 0 // 👈 Вычисляем hasError из массива ошибок
 
     const imageUrl =
       typeof base?.image === 'object' && base?.image !== null ? (base.image.url ?? null) : null
