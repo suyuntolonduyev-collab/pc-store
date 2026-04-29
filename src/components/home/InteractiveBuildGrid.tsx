@@ -130,11 +130,10 @@ export default function InteractiveBuildGrid({ builds = [] }: { builds: Build[] 
 
             <div className="relative w-full md:w-1/2 flex flex-col gap-4">
               <div className="relative h-64 md:h-80 bg-gray-50 rounded-xl flex items-center justify-center p-4 border border-gray-100 shrink-0">
-                {previewBuild.image && typeof previewBuild.image === 'object' ? (
+                {(previewBuild as any).image && typeof (previewBuild as any).image === 'object' ? (
                   <Image
-                    src={(previewBuild.image as Media).url!}
-                    alt={(previewBuild as any).name || 'Сборка'}
-                    fill
+                    src={((previewBuild as any).image as Media).url!}
+                    alt={previewBuild.name || 'Сборка'}
                     className="object-contain p-4"
                     sizes="(max-width: 768px) 90vw, 40vw"
                     priority
