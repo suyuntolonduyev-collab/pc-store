@@ -7,6 +7,7 @@ import * as migration_20260407_055052_added_all_globals from './20260407_055052_
 import * as migration_20260414_175247_Upgrt_instruction_code_section from './20260414_175247_Upgrt_instruction_code_section';
 import * as migration_20260415_095429_added_fps_counter from './20260415_095429_added_fps_counter';
 import * as migration_20260421_045008_added_accesories_collection from './20260421_045008_added_accesories_collection';
+import * as migration_20260428_170056 from './20260428_170056';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20260421_045008_added_accesories_collection.up,
     down: migration_20260421_045008_added_accesories_collection.down,
-    name: '20260421_045008_added_accesories_collection'
+    name: '20260421_045008_added_accesories_collection',
+  },
+  {
+    up: migration_20260428_170056.up,
+    down: migration_20260428_170056.down,
+    name: '20260428_170056'
   },
 ];

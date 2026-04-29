@@ -245,23 +245,6 @@ export default async function HomePage() {
               Каталог товаров
             </Link>
           </div>
-
-          <div className="mt-8 flex justify-center items-center gap-4 text-sm font-medium">
-            <span className="text-gray-400">Быстрый старт:</span>
-            <Link
-              href="/builder?preset=gaming"
-              className="text-blue-400 hover:text-white transition-colors focus:outline-none focus:underline"
-            >
-              Игровой ПК
-            </Link>
-            <span className="text-gray-600">•</span>
-            <Link
-              href="/builder?preset=budget"
-              className="text-blue-400 hover:text-white transition-colors focus:outline-none focus:underline"
-            >
-              Домашний ПК
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -278,7 +261,7 @@ export default async function HomePage() {
               <div className="text-gray-500 font-medium">скорость сборки</div>
             </div>
             <div className="p-4">
-              <div className="text-4xl font-black text-blue-600 mb-2">0%</div>
+              <div className="text-4xl font-black text-blue-600 mb-2">проверка</div>
               <div className="text-gray-500 font-medium">несовместимых сборок</div>
             </div>
           </div>
