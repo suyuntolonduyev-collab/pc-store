@@ -1,7 +1,9 @@
 import Stripe from 'stripe'
 import { PayloadRequest } from 'payload'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy', {
+  // ... настройки
+})
 
 export default async function createPayment(req: PayloadRequest): Promise<Response> {
   try {
